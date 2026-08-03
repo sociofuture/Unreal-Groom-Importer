@@ -1,0 +1,30 @@
+schema_version = "1.0.0"
+
+id = "ue_groom_importer"
+version = "1.0.0"
+name = "Unreal Groom Importer"
+tagline = "Import Unreal Engine Groom assets as Blender Hair Curves"
+maintainer = "Vignesh Narayan S"
+
+type = "add-on"
+
+blender_version_min = "5.2.0"
+
+license = [
+    "SPDX:GPL-3.0-or-later",
+]
+
+website = "https://github.com/vickyat24fps/ue-groom-importer"
+
+copyright = [
+    "2026 Vignesh Narayan S",
+]
+
+tags = [
+    "Import-Export",
+    "Hair",
+    "Pipeline",
+]
+
+[permissions]
+files = "Import Unreal Groom OBJ files, JSON metadata, and bundled assets."
