@@ -100,6 +100,35 @@ def configure_node_group():
         if socket is not None:
             socket.default_value = value
 
+    _default_radius_type(node_group, "Hair")
+
+
+def _default_radius_type(node_group, preset):
+    """
+    Pick a sensible default strand thickness.
+
+    The group ships with 'Radius Type' set to 'Peach Fuzz', the finest of the
+    three presets (Hair / Facial Hair / Peach Fuzz). That renders at roughly a
+    0.0096 mm radius - well under a pixel - so an imported groom looks like
+    nothing is there. 'Hair' is the right default for a hair groom; the socket
+    stays exposed on the modifier either way.
+    """
+
+    for item in node_group.interface.items_tree:
+
+        if getattr(item, "item_type", "") != 'SOCKET':
+            continue
+
+        if item.in_out != 'INPUT' or item.name != "Radius Type":
+            continue
+
+        try:
+            item.default_value = preset
+        except (TypeError, AttributeError):
+            pass
+
+        return
+
 
 # ----------------------------------------------------------
 # Geometry Nodes
