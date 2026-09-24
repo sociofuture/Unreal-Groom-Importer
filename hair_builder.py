@@ -20,6 +20,8 @@ from os import name
 
 import bpy
 
+from mathutils import Matrix
+
 
 # ----------------------------------------------------------
 # Constants
@@ -57,6 +59,8 @@ def build_hair(
     """
 
     obj = _create_empty_hair(name)
+
+    _neutralise_transform(obj)
 
     hair = obj.data
 
@@ -102,6 +106,21 @@ def _create_empty_hair(name):
     obj.data.name = name
 
     return obj
+
+
+def _neutralise_transform(obj):
+    """
+    Drop any transform the new curves object inherited.
+
+    `read_obj` already converts the Unreal centimetres to metres, so the points
+    are world-space metres. A surface imported from FBX normally hangs off an
+    Empty scaled by 0.01, and the curves object is parented to that surface, so
+    without this the 0.01 is applied a second time and the groom arrives 100x
+    too small, collapsed near the origin. Setting the world matrix keeps the
+    parent relationship - only the object's own transform is cleared.
+    """
+
+    obj.matrix_world = Matrix.Identity(4)
 
 
 # ----------------------------------------------------------
