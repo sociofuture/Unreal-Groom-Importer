@@ -27,6 +27,8 @@ ASSET_BLEND = "GroomAssets.blend"
 NODE_GROUP_NAME = "UE_HairCurve"
 MATERIAL_NAME = "UE_HairCurve"
 
+ATTACH_NODE_NAME = "Attach Hair Curves to Surface"
+
 ASSET_FOLDER = Path(__file__).parent / "assets"
 ASSET_FILE = ASSET_FOLDER / ASSET_BLEND
 
@@ -66,6 +68,39 @@ def load_assets():
         destination.materials = materials
 
 
+def configure_node_group():
+    """
+    Fix up the bundled node group for imported grooms.
+
+    'Attach Hair Curves to Surface' ships with 'Snap to Surface' enabled, which
+    re-anchors every curve root onto the surface. The lookup it uses has no
+    surface configured here, so the snap sends the whole groom to the origin -
+    measured at 98.8% of points collapsed. The OBJ already holds absolute root
+    positions and the JSON already holds exact root UVs, so neither the snap nor
+    the re-projection is wanted.
+    """
+
+    node_group = bpy.data.node_groups.get(NODE_GROUP_NAME)
+
+    if node_group is None:
+        return
+
+    node = node_group.nodes.get(ATTACH_NODE_NAME)
+
+    if node is None:
+        return
+
+    for socket_name, value in (
+        ("Use Existing Attachment", True),
+        ("Snap to Surface", False),
+    ):
+
+        socket = node.inputs.get(socket_name)
+
+        if socket is not None:
+            socket.default_value = value
+
+
 # ----------------------------------------------------------
 # Geometry Nodes
 # ----------------------------------------------------------
@@ -76,6 +111,8 @@ def assign_geometry_nodes(obj):
     """
 
     load_assets()
+
+    configure_node_group()
 
     modifier = obj.modifiers.new(
         name="UE Groom",
